@@ -1,4 +1,5 @@
 import { setLineWidth } from './canvasSettings'
+import { refreshPrevImageData } from './canvasStorage'
 import { Drawer } from './Drawer'
 import { $inputLineWidth } from './interface'
 import { $ } from './utilities'
@@ -15,8 +16,13 @@ function setNewActive(btn) {
   btn.classList.add('active')
 }
 
+function refreshLastImageData() {
+  refreshPrevImageData()
+}
+
 function setDrawerMode(mode) {
   Drawer.instance.setMode(mode)
+  refreshLastImageData()
 }
 
 $pencil.addEventListener('click', () => {

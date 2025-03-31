@@ -21,6 +21,7 @@ body {
   grid-template-rows: 90px calc(100vh - 170px) 80px;
   grid-template-columns: 100px calc(100% - 100px);
   background-color: var(--color-bg);
+  user-select: none;
 }
 
 header {

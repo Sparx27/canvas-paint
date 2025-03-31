@@ -1,4 +1,4 @@
-import { getPrevImageData, setPrevImageData } from './canvasStorage'
+import { getPrevImageData, refreshPrevImageData } from './canvasStorage'
 import { canvasSettings, setFillStyle, setGlobalCompositeOperation, setLineWidth, setStrokeStyle } from './canvasSettings'
 import { Drawer } from './Drawer'
 import { $ } from './utilities'
@@ -21,36 +21,48 @@ window.addEventListener('resize', reziseCanvas)
 const ctx = $canvas.getContext('2d', { willReadFrequently: true })
 const drawer = new Drawer(ctx)
 let isDrawing = false
-setPrevImageData()
+refreshPrevImageData()
 
 function beginDraw(e) {
   isDrawing = true
   drawer.setLastPosition(e.offsetX, e.offsetY)
-  if (drawer.mode !== 'erase') { setPrevImageData() }
+  if (drawer.mode === 'erase') {
+    ctx.putImageData(getPrevImageData(), 0, 0)
+    return
+  }
+  if (drawer.mode !== 'erase') {
+    refreshPrevImageData()
+  }
 }
 
 function stopDraw() {
   isDrawing = false
-  setPrevImageData()
+  // refreshPrevImageData()
 }
 
 function draw(e) {
   if (isDrawing) {
-    if (drawer.mode === 'rectangle' || drawer.mode === 'ellipse') { ctx.putImageData(getPrevImageData(), 0, 0) }
+    if (drawer.mode === 'rectangle' || drawer.mode === 'ellipse') {
+      ctx.putImageData(getPrevImageData(), 0, 0)
+    }
     drawer.draw(e.offsetX, e.offsetY)
   }
 }
 
 function drawOne(e) {
   drawer.draw(e.offsetX, e.offsetY)
-  setPrevImageData()
+  refreshPrevImageData()
   drawPreview(e)
 }
 
 function handleMouseLeave(e) {
   if (e.buttons === 1) {
-    drawer.setLastPosition(e.offsetX, e.offsetY)
+    if (drawer.mode !== 'rectangle' && drawer.mode !== 'ellipse') {
+      drawer.setLastPosition(e.offsetX, e.offsetY)
+      refreshPrevImageData()
+    }
   } else {
+    ctx.putImageData(getPrevImageData(), 0, 0)
     isDrawing = false
   }
 }
@@ -58,9 +70,17 @@ function handleMouseLeave(e) {
 function handleMouseEnter(e) {
   if (e.buttons === 1) {
     isDrawing = true
-    drawer.setLastPosition(e.offsetX, e.offsetY)
-    drawer.draw(e.offsetX, e.offsetY)
+    if (drawer.mode === 'rectangle' || drawer.mode === 'ellipse') {
+      ctx.putImageData(getPrevImageData(), 0, 0)
+      return
+    }
+
+    if (drawer.mode !== 'rectangle' && drawer.mode !== 'ellipse') {
+      drawer.setLastPosition(e.offsetX, e.offsetY)
+      drawer.draw(e.offsetX, e.offsetY)
+    }
   } else {
+    refreshPrevImageData()
     isDrawing = false
   }
 }
@@ -75,6 +95,7 @@ $canvas.addEventListener('mouseenter', handleMouseEnter)
 // GET CANVAS MODES PREVIEW
 function drawPreview(e) {
   if (e.buttons === 1) return
+  if (drawer.mode === 'rectangle' || drawer.mode === 'ellipse') return
   ctx.putImageData(getPrevImageData(), 0, 0)
 
   // Prev configrations
@@ -86,10 +107,7 @@ function drawPreview(e) {
     ctx.beginPath()
     ctx.arc(e.offsetX, e.offsetY, canvasSettings.lineWidth / 2, 0, Math.PI * 2)
     ctx.fill()
-    return
-  }
-
-  if (drawer.mode === 'erase') {
+  } else if (drawer.mode === 'erase') {
     ctx.lineWidth = 1
     ctx.fillStyle = 'white'
 
