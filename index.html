@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./src/style.css">
+  <title>ElpAINT</title>
+</head>
+
+<body>
+  <header>
+    <h1>Paint</h1>
+  </header>
+
+  <aside>
+
+    <ul>
+      <li><button id="pencil" title="pencil" class="active"></button></li>
+      <li><button id="erase" title="erase"></button></li>
+      <li><button id="rectangle" title="rectangle"></button></li>
+      <li><button id="ellipse" title="ellipse"></button></li>
+    </ul>
+
+    <div id="options">
+      <div class="option">
+        <label for="lineWidth">Size</label>
+        <input type="number" id="lineWidth">
+      </div>
+
+      <div class="btns">
+        <button id="btn-lw-1">1</button>
+        <button id="btn-lw-4">4</button>
+        <button id="btn-lw-10">10</button>
+        <button id="btn-lw-15">15</button>
+      </div>
+    </div>
+
+  </aside>
+
+  <main>
+    <canvas id="canvas"></canvas>
+  </main>
+
+  <footer>
+    <h2>Footer</h2>
+  </footer>
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
